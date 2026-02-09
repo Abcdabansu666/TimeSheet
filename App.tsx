@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Clock, Users, FileText, List, Plus, Briefcase, UserPlus, X, Calendar as CalendarIcon, Upload } from 'lucide-react';
+import { Clock, Users, FileText, List, Plus, Briefcase, UserPlus, X, Calendar as CalendarIcon, Upload, Sparkles } from 'lucide-react';
 import { TimeEntry, TabType, ActiveSession } from './types';
 import { getTorontoISODate, getTorontoTimeString, getTorontoDate, getTorontoTime12h } from './utils';
 import Dashboard from './components/Dashboard';
@@ -9,6 +9,7 @@ import Report from './components/Report';
 import AddEntry from './components/AddEntry';
 
 const App: React.FC = () => {
+  const [showIntro, setShowIntro] = useState(true);
   const [entries, setEntries] = useState<TimeEntry[]>(() => {
     const saved = localStorage.getItem('timesheet_entries_v2');
     return saved ? JSON.parse(saved) : [];
@@ -33,6 +34,14 @@ const App: React.FC = () => {
   const [editingEntry, setEditingEntry] = useState<TimeEntry | null>(null);
   const [isCreatingNew, setIsCreatingNew] = useState(false);
   const [currentTime, setCurrentTime] = useState(getTorontoTime12h());
+
+  // Handle Intro Screen
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowIntro(false);
+    }, 2500);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Timer for header
   useEffect(() => {
@@ -148,8 +157,32 @@ const App: React.FC = () => {
     day: 'numeric'
   });
 
+  if (showIntro) {
+    return (
+      <div className="fixed inset-0 bg-[#1f2a44] flex flex-col items-center justify-center z-[9999] transition-all duration-700">
+        <div className="flex flex-col items-center animate-bounce">
+          <div className="bg-white/10 p-5 rounded-3xl mb-6 backdrop-blur-md border border-white/10">
+            <Clock className="w-16 h-16 text-[#ff9559]" />
+          </div>
+          <h1 className="text-4xl font-black text-white tracking-tighter uppercase mb-2">Timesheet Team</h1>
+          <div className="h-1 w-24 bg-[#ff9559] rounded-full mb-8"></div>
+        </div>
+        <div className="flex items-center gap-2 opacity-0 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-500 fill-mode-forwards">
+          <Sparkles className="w-4 h-4 text-[#8eba2b]" />
+          <p className="text-sm font-black text-white/60 uppercase tracking-[0.4em]">Created by Finest Painters</p>
+          <Sparkles className="w-4 h-4 text-[#8eba2b]" />
+        </div>
+        <div className="mt-12 flex gap-1">
+          <div className="w-2 h-2 rounded-full bg-white/20 animate-pulse"></div>
+          <div className="w-2 h-2 rounded-full bg-white/20 animate-pulse delay-75"></div>
+          <div className="w-2 h-2 rounded-full bg-white/20 animate-pulse delay-150"></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-white flex flex-col font-sans">
+    <div className="min-h-screen bg-white flex flex-col font-sans animate-in fade-in duration-500">
       <header className="bg-[#1f2a44] text-white shadow-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -157,7 +190,10 @@ const App: React.FC = () => {
               <Clock className="w-8 h-8 text-[#ff9559]" />
             </div>
             <div>
-              <h1 className="text-xl font-black tracking-tighter uppercase leading-none">Timesheet Team</h1>
+              <div className="flex items-baseline gap-2">
+                <h1 className="text-xl font-black tracking-tighter uppercase leading-none">Timesheet Team</h1>
+              </div>
+              <p className="text-[8px] font-black text-white/40 uppercase tracking-[0.1em] mt-0.5">Created by Finest Painters</p>
               <p className="text-[10px] font-bold text-[#8eba2b] uppercase tracking-[0.2em] mt-1 flex items-center gap-1">
                 <CalendarIcon className="w-3 h-3" /> {formattedDate}
               </p>
